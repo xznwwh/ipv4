@@ -1,0 +1,28 @@
+name: Fetch and Store IP
+
+on:
+  schedule:
+    - cron: '5 * * * *'  # 每小时的第 5 分钟执行一次
+
+jobs:
+  fetch-and-store:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v2
+
+    - name: Fetch IP
+      run: |
+        # 使用 curl 获取指定域名的内容
+        ip=$(curl -s https://cloudflare.vmshop.org/ipv4.php)
+
+        # 将 IP 保存到文件
+        echo "$ip" > fetched_ip.txt
+
+        # 将文件推送回 GitHub 仓库
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add fetched_ip.txt
+        git commit -m "Update fetched IP"
+        git push
